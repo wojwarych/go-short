@@ -1,2 +1,2 @@
 dev:
-	go run main.go
+	docker-compose -f ./docker/docker-compose.yml up --build
