@@ -1,0 +1,6 @@
+.exe
+.sublime-*
+.md
+.git
+.gitignore
+makefile
