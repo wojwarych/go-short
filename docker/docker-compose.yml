@@ -8,6 +8,17 @@ services:
     entrypoint: /go-short/go-short
     ports:
       - 8000:8000
+    depends_on:
+      - db
+    networks:
+      - go-short
+
+  db:
+    image: postgres:13
+    ports:
+    - 5434:5432
+    env_file:
+      - ../local.env
     networks:
       - go-short
 
