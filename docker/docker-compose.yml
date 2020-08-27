@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  web:
+    image: go-short_web
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    entrypoint: /go-short/go-short
+    ports:
+      - 8000:8000
+    networks:
+      - go-short
+
+networks:
+  go-short:
+    name: go-short
