@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type URL struct {
 	gorm.Model
-	ShortURL string `gorm:"not_null"`
-	LongURL  string `gorm:"not_null;unique"`
+	ShortURL string `gorm:"notNull"`
+	LongURL  string `gorm:"notNull;unique"`
 }

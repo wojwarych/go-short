@@ -1,22 +1,16 @@
 package db
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+const dsn = "host=db port=5432 user=postgres password=password sslmode=disable"
 
 func Open() (*gorm.DB, error) {
-	var err error
-	DB, err = gorm.Open("postgres", "host=db port=5432 user=postgres password=password sslmode=disable")
+	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
 	return DB, nil
-}
-
-func Close() error {
-	return DB.Close()
 }
