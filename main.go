@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/warycwoj/go-short/db"
+	"github.com/warycwoj/go-short/models"
 	"github.com/warycwoj/go-short/shortener"
 )
 
@@ -24,18 +25,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	db.Migrator().DropTable(&URL{})
-	db.Migrator().CreateTable(&URL{})
-	if db.Migrator().HasTable(&URL{}) {
-		db.Migrator().AutoMigrate(&URL{})
+	urlTable := models.URL{}
+	db.Migrator().DropTable(&urlTable)
+	db.Migrator().CreateTable(&urlTable)
+	if db.Migrator().HasTable(&urlTable) {
+		db.Migrator().AutoMigrate(&urlTable)
 	}
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"title": "Main website",
 		})
-		rows, _ := db.Model(&URL{}).Rows()
+		rows, _ := db.Model(&urlTable).Rows()
 		for rows.Next() {
-			var url URL
+			var url models.URL
 			db.ScanRows(rows, &url)
 			log.Printf("%v\n, %d", url, url.ID)
 		}
@@ -43,7 +45,7 @@ func main() {
 	r.POST("/", func(c *gin.Context) {
 		var postedURL PostedURL
 		c.ShouldBind(&postedURL)
-		lastRecord := URL{}
+		lastRecord := models.URL{}
 		ret := db.Last(&lastRecord)
 		var shortPath string
 		if errors.Is(ret.Error, gorm.ErrRecordNotFound) {
@@ -61,13 +63,13 @@ func main() {
 			Path:   shortPath,
 		}
 		log.Printf("%s", short)
-		newURLRow := &URL{LongURL: postedURL.LongURL, ShortURL: short.String()}
+		newURLRow := &models.URL{LongURL: postedURL.LongURL, ShortURL: short.String()}
 		db.Create(newURLRow)
 	})
 	r.GET("/:url/", func(c *gin.Context) {
 		desiredURL := c.Param("url")
 		decodedPK := shortener.Decoder(desiredURL)
-		urlModel := URL{}
+		urlModel := models.URL{}
 		ret := db.First(&urlModel, decodedPK)
 		if errors.Is(ret.Error, gorm.ErrRecordNotFound) {
 			c.HTML(http.StatusNotFound, "URL not found in DB!", nil)
